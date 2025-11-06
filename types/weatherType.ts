@@ -74,16 +74,9 @@ export type Wind = {
 
 export type WeatherState = {
   place: string | null;
-  apiResponse: WeatherApiResponseType | null;
-  currWeather: WeatherForecast | null;
-  dailyforecasts: WeatherForecast[];
-  isLoading: boolean;
-  error: string | null;
 };
 
 export type WeatherActions = {
-  fetchWeatherByCoords: (lat: number, lon: number) => Promise<void>;
-  fetchWeatherByCity: (city: string) => Promise<void>;
-};
-
+  setPlace: (city:string)=> void
+}
 export type WeatherStore = WeatherState & WeatherActions;

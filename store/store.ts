@@ -6,21 +6,11 @@ import { create } from 'zustand';
 //   // Add your state properties here
 // }
 
-const initialState:WeatherState = {
+const initialState: WeatherState = {
   place: null,
-  apiResponse:null,
-  currWeather: null,
-  dailyforecasts: [],
-  isLoading: true,
-  error: null,
 };
 
 export const useWeather = create<WeatherStore>((set) => ({
-    ...initialState,
-    fetchWeatherByCoords: async (lat, lon) => {
-        console.log(lat,lon);
-    },
-    fetchWeatherByCity: async (city) => {
-        console.log(city);
-    },
+  ...initialState,
+  setPlace: (city) => set({ place: city }),
 }));
