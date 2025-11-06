@@ -1,15 +1,10 @@
-import { create } from 'zustand';
+// Global state store - add your state management here
+// Example: import { create } from 'zustand';
 
-export interface BearState {
-  bears: number;
-  increasePopulation: () => void;
-  removeAllBears: () => void;
-  updateBears: (newBears: number) => void;
-}
+// export interface AppState {
+//   // Add your state properties here
+// }
 
-export const useStore = create<BearState>((set) => ({
-  bears: 0,
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-  updateBears: (newBears) => set({ bears: newBears }),
-}));
+// export const useStore = create<AppState>((set) => ({
+//   // Add your state and actions here
+// }));
