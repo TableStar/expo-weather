@@ -25,8 +25,10 @@ export const fetchCitySuggestions = async (query: string) => {
     const {data} = await axios.get(
       `https://api.openweathermap.org/data/2.5/find?q=${query}&appid=${OPENWEATHER_KEY}`
     );
+    console.log(data.list);
     return data.list.map((item: any) => item.name);
   } catch (e) {
     console.log(e);
+    return [];
   }
 };
