@@ -16,7 +16,7 @@ export default function ModalScreen() {
           Modal Screen
         </Text>
         <Text variant="body" className="mt-4 text-center">
-          This is a modal screen. You can customize it for your weather app!
+          This is a modal screen for settings.
         </Text>
       </View>
     </>

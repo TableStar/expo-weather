@@ -1,16 +1,35 @@
-// Global state store - add your state management here
-import { WeatherState, WeatherStore } from '@/types/weatherType';
+import { TransactionStore } from '@/types/transactionType';
 import { create } from 'zustand';
 
-// export interface AppState {
-//   // Add your state properties here
-// }
-
-const initialState: WeatherState = {
-  place: null,
+const initialState = {
+  transactions: [],
+  filters: {},
 };
 
-export const useWeather = create<WeatherStore>((set) => ({
+export const useTransactions = create<TransactionStore>((set) => ({
   ...initialState,
-  setPlace: (city) => set({ place: city }),
+  addTransaction: (transaction) =>
+    set((state) => ({
+      transactions: [
+        ...state.transactions,
+        {
+          ...transaction,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+    })),
+  updateTransaction: (id, updates) =>
+    set((state) => ({
+      transactions: state.transactions.map((t) =>
+        t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
+      ),
+    })),
+  deleteTransaction: (id) =>
+    set((state) => ({
+      transactions: state.transactions.filter((t) => t.id !== id),
+    })),
+  setFilters: (filters) => set({ filters }),
+  resetFilters: () => set({ filters: {} }),
 }));
