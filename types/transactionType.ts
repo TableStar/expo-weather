@@ -1,27 +1,18 @@
-export type TransactionType = 'expense' | 'income';
+export type TransactionType = 'in' | 'out';
 
 export type Transaction = {
-  id: string;
+  id: number;
   type: TransactionType;
   amount: number;
-  category: string;
-  description: string;
+  notes: string | null;
   date: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  type: TransactionType;
-  icon: string;
-  color: string;
+  created_at: string;
+  time: string;
+  deleted_at: string | null;
 };
 
 export type TransactionFilters = {
   type?: TransactionType;
-  category?: string;
   startDate?: string;
   endDate?: string;
 };
@@ -32,11 +23,13 @@ export type TransactionState = {
 };
 
 export type TransactionActions = {
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateTransaction: (id: string, updates: Partial<Transaction>) => void;
-  deleteTransaction: (id: string) => void;
-  setFilters: (filters: TransactionFilters) => void;
-  resetFilters: () => void;
+  addTransaction: (
+    transaction: Omit<Transaction, 'id' | 'created_at' | 'deleted_at'>
+  ) => Promise<void>;
+  updateTransaction: (id: number, updates: Partial<Transaction>) => Promise<void>;
+  deleteTransaction: (id: number) => Promise<void>;
+  setFilters: (filters: TransactionFilters) => Promise<void>;
+  loadTransactions: () => Promise<void>;
 };
 
 export type TransactionStore = TransactionState & TransactionActions;

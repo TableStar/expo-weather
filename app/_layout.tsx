@@ -11,6 +11,8 @@ import { ThemeToggle } from '@/components/nativewindui/ThemeToggle';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { NAV_THEME } from '@/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SQLiteProvider } from 'expo-sqlite';
+import { initDb } from '@/lib/db/schema';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -32,19 +34,21 @@ export default function RootLayout() {
       />
       {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
       {/* <ExampleProvider> */}
-      <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <ActionSheetProvider>
-            <NavThemeProvider value={NAV_THEME[colorScheme]}>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
-                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-              </Stack>
-            </NavThemeProvider>
-          </ActionSheetProvider>
-        </GestureHandlerRootView>
-      </QueryClientProvider>
+      <SQLiteProvider databaseName="finance.db" onInit={initDb}>
+        <QueryClientProvider client={queryClient}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <ActionSheetProvider>
+              <NavThemeProvider value={NAV_THEME[colorScheme]}>
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
+                  <Stack.Screen name="modal" options={MODAL_OPTIONS} />
+                </Stack>
+              </NavThemeProvider>
+            </ActionSheetProvider>
+          </GestureHandlerRootView>
+        </QueryClientProvider>
+      </SQLiteProvider>
       {/* </ExampleProvider> */}
     </>
   );

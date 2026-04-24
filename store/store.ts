@@ -1,35 +1,77 @@
-import { TransactionStore } from '@/types/transactionType';
+import { TransactionState, TransactionStore } from '@/types/transactionType';
+import {
+  addTransaction as addTransactionDb,
+  getTransactions,
+  updateTransaction as updateTransactionDb,
+  deleteTransaction as deleteTransactionDb,
+} from '@/lib/db/transactions';
 import { create } from 'zustand';
 
-const initialState = {
+const initialState: TransactionState & { isLoading: boolean } = {
   transactions: [],
   filters: {},
+  isLoading: false,
 };
 
-export const useTransactions = create<TransactionStore>((set) => ({
+export const useTransactions = create<TransactionStore & { isLoading: boolean }>((set) => ({
   ...initialState,
-  addTransaction: (transaction) =>
-    set((state) => ({
-      transactions: [
-        ...state.transactions,
-        {
-          ...transaction,
-          id: crypto.randomUUID(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    })),
-  updateTransaction: (id, updates) =>
-    set((state) => ({
-      transactions: state.transactions.map((t) =>
-        t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
-      ),
-    })),
-  deleteTransaction: (id) =>
-    set((state) => ({
-      transactions: state.transactions.filter((t) => t.id !== id),
-    })),
-  setFilters: (filters) => set({ filters }),
-  resetFilters: () => set({ filters: {} }),
+  addTransaction: async (transaction) => {
+    set({ isLoading: true });
+    try {
+      await addTransactionDb({
+        type: transaction.type,
+        amount: transaction.amount,
+        notes: transaction.notes,
+        date: transaction.date,
+        time: transaction.time,
+      });
+      const rows = await getTransactions();
+      set({ transactions: rows, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  updateTransaction: async (id, updates) => {
+    set({ isLoading: true });
+    try {
+      await updateTransactionDb(id, updates);
+      const rows = await getTransactions();
+      set({ isLoading: false, transactions: rows });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  deleteTransaction: async (id) => {
+    set({ isLoading: true });
+    try {
+      await deleteTransactionDb(id);
+      const rows = await getTransactions();
+      set({ transactions: rows, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  setFilters: async (filters) => {
+    set({ filters, isLoading: true });
+    try {
+      const rows = await getTransactions(filters);
+      set({ transactions: rows, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  loadTransactions: async () => {
+    set({ isLoading: true });
+    try {
+      const rows = await getTransactions();
+      set({ transactions: rows, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
 }));
