@@ -116,3 +116,47 @@ export async function getTotalsByDateRange(startDate: string, endDate: string) {
 
   return { income, expense };
 }
+
+export async function seedMockData() {
+  function daysAgo(n: number) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().slice(0, 10);
+  }
+  const mockTrans = [
+    {
+      type: 'in' as const,
+      amount: 2000000,
+      notes: 'Gaji bulanan',
+      date: daysAgo(0),
+      time: '09:00',
+    },
+    {
+      type: 'out' as const,
+      amount: 20000,
+      notes: 'Makan siang',
+      date: daysAgo(0),
+      time: '12:30',
+    },
+    { type: 'out' as const, amount: 50000, notes: 'Bensin', date: daysAgo(1), time: '07:45' },
+    { type: 'in' as const, amount: 150000, notes: 'Jual barang', date: daysAgo(1), time: '14:00' },
+    { type: 'out' as const, amount: 35000, notes: 'Beli pulsa', date: daysAgo(2), time: '10:00' },
+    { type: 'out' as const, amount: 12000, notes: 'Kopi pagi', date: daysAgo(0), time: '07:00' },
+    {
+      type: 'out' as const,
+      amount: 65000,
+      notes: 'Belanja warung',
+      date: daysAgo(1),
+      time: '18:30',
+    },
+    { type: 'in' as const, amount: 500000, notes: 'Freelance', date: daysAgo(2), time: '16:00' },
+    { type: 'out' as const, amount: 30000, notes: 'Parkir mall', date: daysAgo(3), time: '13:00' },
+    { type: 'in' as const, amount: 100000, notes: 'Refund', date: daysAgo(3), time: '11:00' },
+    { type: 'out' as const, amount: 8500, notes: 'Parkir kantor', date: daysAgo(0), time: '08:15' },
+    { type: 'out' as const, amount: 45000, notes: 'Nasi padang', date: daysAgo(2), time: '13:00' },
+  ];
+
+  for (const tr of mockTrans) {
+    await addTransaction(tr);
+  }
+}
