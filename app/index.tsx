@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useTransactions } from '@/store/store';
+import { TransactionsList } from '@/components/TransactionsList';
 
 const FILTERS = ['All', 'Daily', 'Weekly', 'Monthly', 'Yearly'] as const;
 
 export default function Home() {
-  const [activeFilter, setActiveFilter] = useState('All');
   const insets = useSafeAreaInsets();
+  const [activeFilter, setActiveFilter] = useState('All');
+  const { transactions, loadTransactions, isLoading } = useTransactions();
   const [currAccount, setCurrAccount] = useState('Account_Name');
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
   return (
     <View
       className="flex-1 bg-background"
@@ -56,9 +64,9 @@ export default function Home() {
           );
         })}
       </ScrollView>
-      <ScrollView className="flex-1 px-4 pt-2">
-        <Text className="mt-10 text-center text-muted-foreground">Transaction here</Text>
-      </ScrollView>
+      <View className="flex-1 pt-2">
+        <TransactionsList transactions={transactions} />
+      </View>
       <View className=" flex-row items-center justify-around gap-3 px-4 py-2">
         <TouchableOpacity className="flex-1 rounded-xl bg-green-400 px-4 py-2">
           <Text className="text-center text-xl font-semibold text-white">Income</Text>
