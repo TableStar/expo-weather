@@ -1,21 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useTransactions } from '@/store/store';
 import { TransactionsList } from '@/components/TransactionsList';
-
-const FILTERS = ['All', 'Daily', 'Weekly', 'Monthly', 'Yearly'] as const;
+import { FILTERS, FilterType } from '@/types/types';
+import { getDateRange } from '@/lib/date';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
-  const [activeFilter, setActiveFilter] = useState('All');
-  const { transactions, loadTransactions, isLoading } = useTransactions();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('All');
+  const [periodeOffset, setPeriodeOffset] = useState(0);
+  const { transactions, setFilters } = useTransactions();
   const [currAccount, setCurrAccount] = useState('Account_Name');
 
   useEffect(() => {
-    loadTransactions();
-  }, []);
+    if (activeFilter === 'All') {
+      setFilters({});
+      return;
+    }
+    const { startDate, endDate } = getDateRange(activeFilter, periodeOffset);
+    setFilters({ startDate, endDate });
+  }, [activeFilter, periodeOffset]);
+
+  const handleFilterChange = (filter: FilterType) => {
+    setActiveFilter(filter);
+    setPeriodeOffset(0);
+  };
+
+  const dateRange = useMemo(() => {
+    if (activeFilter === 'All') return null;
+    return getDateRange(activeFilter, periodeOffset);
+  }, [activeFilter, periodeOffset]);
+
+  const { income, expense, balance } = useMemo(() => {
+    let income = 0;
+    let expense = 0;
+    for (const tr of transactions) {
+      if (tr.type === 'in') income += tr.amount;
+      else expense += tr.amount;
+    }
+    return { income, expense, balance: income - expense };
+  }, [transactions]);
+
+  const frmt = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
   return (
     <View
@@ -24,7 +52,7 @@ export default function Home() {
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}>
-      <View className="flex-row items-center justify-between bg-orange-600 px-4 py-3">
+      <View className="flex-row items-center justify-between bg-[#901E3E] px-4 py-3">
         <View className="flex-row items-center gap-3">
           <TouchableOpacity>
             <Ionicons name="menu" size={28} color="white" />
@@ -46,13 +74,13 @@ export default function Home() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        className="flex-grow-0 border-b border-border bg-orange-600 py-2 "
+        className="flex-grow-0 border-b border-border bg-[#901E3E] py-2 "
         contentContainerClassName="px-4">
         {FILTERS.map((filter) => {
           return (
             <TouchableOpacity
               key={filter}
-              onPress={() => setActiveFilter(filter)}
+              onPress={() => handleFilterChange(filter)}
               className={`rounded-xl px-3 py-2 ${activeFilter === filter ? 'bg-white' : 'bg-transparent'}`}>
               <Text
                 className={`font-medium ${
@@ -64,6 +92,17 @@ export default function Home() {
           );
         })}
       </ScrollView>
+      {dateRange && (
+        <View className="flex-row items-center justify-between gap-4 border-b border-border bg-card py-2 px-4">
+          <TouchableOpacity onPress={() => setPeriodeOffset((o) => o - 1)}>
+            <Ionicons name="chevron-back" size={20} color="white" />
+          </TouchableOpacity>
+          <Text className="text-base font-semibold text-foreground">{dateRange.label}</Text>
+          <TouchableOpacity onPress={() => setPeriodeOffset((o) => o + 1)}>
+            <Ionicons name="chevron-forward" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
       <View className="flex-1 pt-2">
         <TransactionsList transactions={transactions} />
       </View>
@@ -78,15 +117,15 @@ export default function Home() {
       <View className="flex-row items-center justify-evenly gap-2 border-t border-border bg-card px-4 pb-3 pt-2">
         <View>
           <Text className="text-sm text-green-500">Total Income</Text>
-          <Text className="font-bold  text-green-500">Rp 1.500.000</Text>
+          <Text className="font-bold text-green-500">{frmt(income)}</Text>
         </View>
         <View>
-          <Text className="text-sm  text-red-700">Total Expense</Text>
-          <Text className="font-bold  text-red-700">Rp 1.500.000</Text>
+          <Text className="text-sm text-red-700">Total Expense</Text>
+          <Text className="font-bold text-red-700">{frmt(expense)}</Text>
         </View>
         <View>
           <Text className="text-sm text-muted-foreground">Balance</Text>
-          <Text className="font-bold text-foreground">Rp 1.500.000</Text>
+          <Text className="font-bold text-foreground">{frmt(balance)}</Text>
         </View>
       </View>
     </View>
