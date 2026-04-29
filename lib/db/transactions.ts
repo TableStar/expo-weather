@@ -160,3 +160,13 @@ export async function seedMockData() {
     await addTransaction(tr);
   }
 }
+
+export async function getBalance(beforeDate: string) {
+  const sql = `
+  SELECT SUM(CASE WHEN type = 'in' THEN amount ELSE -amount END) as balance
+  FROM transactions
+  WHERE deleted_at IS NULL AND date < ?
+  `;
+  const res = await db.getFirstAsync<{ balance: number | null }>(sql, beforeDate);
+  return res?.balance ?? 0;
+}

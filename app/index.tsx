@@ -11,7 +11,7 @@ export default function Home() {
   const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [periodeOffset, setPeriodeOffset] = useState(0);
-  const { transactions, setFilters } = useTransactions();
+  const { transactions, setFilters, previousBalance } = useTransactions();
   const [currAccount, setCurrAccount] = useState('Account_Name');
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function Home() {
         })}
       </ScrollView>
       {dateRange && (
-        <View className="flex-row items-center justify-between gap-4 border-b border-border bg-card py-2 px-4">
+        <View className="flex-row items-center justify-between gap-4 border-b border-border bg-card px-4 py-2">
           <TouchableOpacity onPress={() => setPeriodeOffset((o) => o - 1)}>
             <Ionicons name="chevron-back" size={20} color="white" />
           </TouchableOpacity>
@@ -103,7 +103,13 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       )}
-      <View className="flex-1 pt-2">
+      {activeFilter !== 'All' && previousBalance !== null && (
+        <View className="flex-row items-center gap-2 px-4 py-2">
+          <Text className="text-sm text-muted-foreground">Previous Balance</Text>
+          <Text className="font-bold text-foreground">{frmt(previousBalance)}</Text>
+        </View>
+      )}
+      <View className="flex-1 pt-1">
         <TransactionsList transactions={transactions} />
       </View>
       <View className=" flex-row items-center justify-around gap-3 px-4 py-2">
@@ -128,6 +134,18 @@ export default function Home() {
           <Text className="font-bold text-foreground">{frmt(balance)}</Text>
         </View>
       </View>
+      {activeFilter !== 'All' && previousBalance !== null && (
+        <View className="flex-col border-t border-border bg-card px-4 py-2">
+          <View className="flex-row items-center justify-end gap-2">
+            <Text className="text-sm text-muted-foreground">Previous Balance</Text>
+            <Text className="font-bold text-foreground">{frmt(previousBalance)}</Text>
+          </View>
+          <View className="flex-row items-center justify-end gap-2">
+            <Text className="text-sm text-muted-foreground">Ending Balance</Text>
+            <Text className="font-bold text-foreground">{frmt(previousBalance + balance)}</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

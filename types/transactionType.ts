@@ -20,6 +20,7 @@ export type TransactionFilters = {
 export type TransactionState = {
   transactions: Transaction[];
   filters: TransactionFilters;
+  previousBalance: number|null
 };
 
 export type TransactionActions = {

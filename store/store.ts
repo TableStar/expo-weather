@@ -4,6 +4,7 @@ import {
   getTransactions,
   updateTransaction as updateTransactionDb,
   deleteTransaction as deleteTransactionDb,
+  getBalance,
 } from '@/lib/db/transactions';
 import { create } from 'zustand';
 
@@ -11,6 +12,7 @@ const initialState: TransactionState & { isLoading: boolean } = {
   transactions: [],
   filters: {},
   isLoading: false,
+  previousBalance: null,
 };
 
 export const useTransactions = create<TransactionStore & { isLoading: boolean }>((set) => ({
@@ -55,10 +57,17 @@ export const useTransactions = create<TransactionStore & { isLoading: boolean }>
     }
   },
   setFilters: async (filters) => {
-    set({ filters, isLoading: true });
     try {
-      const rows = await getTransactions(filters);
-      set({ transactions: rows, isLoading: false });
+      if (!filters.startDate) {
+        const rows = await getTransactions(filters);
+        set({ transactions: rows, isLoading: false, previousBalance: null });
+        return;
+      }
+      const [rows, balance] = await Promise.all([
+        getTransactions(filters),
+        getBalance(filters.startDate),
+      ]);
+      set({ transactions: rows, isLoading: false, previousBalance: balance });
     } catch (error) {
       set({ isLoading: false });
       throw error;
