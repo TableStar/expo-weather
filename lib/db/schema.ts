@@ -15,7 +15,8 @@ export async function initDb() {
 
       -- Amount in smallest currency unit (e.g. 6500 = Rp 6.500)
       -- INTEGER avoids floating point issues
-      amount      INTEGER NOT NULL CHECK(amount > 0),
+      -- Its REAL now, not INTEGER anymore
+      amount      REAL NOT NULL CHECK(amount > 0),
 
       -- Optional note like 'warung kopu', 'gaji'
       notes       TEXT,

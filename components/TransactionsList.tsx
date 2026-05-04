@@ -8,7 +8,7 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
   return (
     <SectionList
       sections={sections}
-      contentContainerClassName='px-4'
+      contentContainerClassName="px-4"
       keyExtractor={(item) => item.id.toString()}
       renderSectionHeader={({ section: { title } }) => (
         <View className="bg-background py-2">
@@ -23,7 +23,11 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
           </View>
           <Text
             className={`text-base font-semibold ${item.type === 'in' ? 'text-green-500' : 'text-red-500'}`}>
-            {item.type === 'in' ? '+' : '-'} Rp {item.amount.toLocaleString('id-ID')}
+            {item.type === 'in' ? '+' : '-'} Rp{' '}
+            {item.amount.toLocaleString('id-ID', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </Text>
         </View>
       )}

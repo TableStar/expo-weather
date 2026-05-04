@@ -43,7 +43,8 @@ export default function Home() {
     return { income, expense, balance: income - expense };
   }, [transactions]);
 
-  const frmt = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+  const frmt = (n: number) =>
+    `Rp ${n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <View
