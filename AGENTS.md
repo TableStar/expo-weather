@@ -23,6 +23,16 @@ This document provides guidelines for AI agents working on this codebase.
 - Only switch to build mode when explicitly requested by the user.
 - Act as a **helper and backup executor** when the user is stuck or unmotivated, not as the primary implementer.
 
+## Subagents
+
+Specialized AI agents with isolated context, dispatched for focused subtasks. Each subagent gets fresh context with no conversation history pollution.
+
+- **When to use:** Exploratory codebase analysis, multi-step implementation tasks, code reviews.
+- **Types:**
+  - `explore` — fast, targeted codebase navigation and understanding.
+  - `general` — full implementation or research tasks.
+- The main agent coordinates and dispatches subagents as needed.
+
 ## Project Overview
 
 An expense/income tracker app with local-first data storage.
